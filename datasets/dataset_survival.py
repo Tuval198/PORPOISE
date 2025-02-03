@@ -45,7 +45,8 @@ class Generic_WSI_Survival_Dataset(Dataset):
             np.random.shuffle(slide_data)
 
         slide_data = pd.read_csv(csv_path, low_memory=False)
-        #slide_data = slide_data.drop(['Unnamed: 0'], axis=1)
+        # slide_data = slide_data.drop(['Unnamed: 0'], axis=1)
+
         if 'case_id' not in slide_data:
             slide_data.index = slide_data.index.str[:12]
             slide_data['case_id'] = slide_data.index
@@ -111,13 +112,15 @@ class Generic_WSI_Survival_Dataset(Dataset):
         new_cols = list(slide_data.columns[-1:]) + list(slide_data.columns[:-1])  ### PORPOISE
         slide_data = slide_data[new_cols]
         self.slide_data = slide_data
-        metadata = ['disc_label', 'Unnamed: 0', 'case_id', 'label', 'slide_id', 'age', 'site', 'survival_months', 'censorship', 'is_female', 'oncotree_code', 'train']
+        metadata = ['disc_label', 'case_id', 'slide_id', 'label', 'site', 'is_female', 'oncotree_code', 'age', 'survival_months', 'censorship', 'train', 'treatment']
         self.metadata = slide_data.columns[:12]
         
         for col in slide_data.drop(self.metadata, axis=1).columns:
-            if not pd.Series(col).str.contains('|_cnv|_rnaseq|_rna|_mut')[0]:
+            if not pd.Series(col).str.contains('|_cnv|_rnaseq|_rna|_mut|_muth')[0]:
                 print(col)
         #pdb.set_trace()
+        
+        print("metadata: ", self.metadata)
 
         assert self.metadata.equals(pd.Index(metadata))
         self.mode = mode

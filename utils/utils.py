@@ -48,11 +48,20 @@ def collate_features(batch):
     return [img, coords]
 
 def collate_MIL_survival(batch):
-    img = torch.cat([item[0] for item in batch], dim = 0)
-    omic = torch.cat([item[1] for item in batch], dim = 0).type(torch.FloatTensor)
-    label = torch.LongTensor([item[2] for item in batch])
-    event_time = torch.FloatTensor([item[3] for item in batch])
-    c = torch.FloatTensor([item[4] for item in batch])
+    print("Batch:", batch)
+    if len(batch) == 1:
+        img = batch[0][0]
+        omic = batch[0][1].type(torch.FloatTensor)
+        label = torch.LongTensor([batch[0][2].item()])
+        event_time = torch.FloatTensor([batch[0][3].item()])
+        c = torch.FloatTensor([batch[0][4].item()])
+    else:
+        img = torch.cat([item[0] for item in batch], dim=0)
+        omic = torch.cat([item[1] for item in batch], dim=0).type(torch.FloatTensor)
+        label = torch.LongTensor([item[2].item() for item in batch])
+        event_time = torch.FloatTensor([item[3].item() for item in batch])
+        c = torch.FloatTensor([item[4].item() for item in batch])
+    
     return [img, omic, label, event_time, c]
 
 def collate_MIL_survival_cluster(batch):
@@ -191,7 +200,7 @@ def calculate_error(Y_hat, Y):
 
 def make_weights_for_balanced_classes_split(dataset):
     N = float(len(dataset))                                           
-    weight_per_class = [N/len(dataset.slide_cls_ids[c]) for c in range(len(dataset.slide_cls_ids))]                                                                                                     
+    weight_per_class = [N/len(dataset.slide_cls_ids[c]) for c in range(len(dataset.slide_cls_ids)) if len(dataset.slide_cls_ids[c]) > 0]                                                                                                 
     weight = [0] * int(N)                                           
     for idx in range(len(dataset)):   
         y = dataset.getlabel(idx)                        
@@ -389,7 +398,7 @@ def get_custom_exp_code(args):
         - args (NameSpace)
     """
     exp_code = '_'.join(args.split_dir.split('_')[:2])
-    dataset_path = 'datasets_csv'
+    dataset_path = 'home/ubuntu/Tuval/Multi_Modal_Fusion/Pan_Cancer/Deep4_9TB_HD/TCGA_Datasets/TCGA_BRCA/Raw_Data/Example/Omics_Data'
     param_code = ''
 
     ### Model Type
@@ -426,7 +435,8 @@ def get_custom_exp_code(args):
     if args.dropinput:
       param_code += '_drop%s' % str(int(args.dropinput*100))
 
-    param_code += '_%s' % args.which_splits.split("_")[0]
+    splits_dir = args.which_splits.split("/")[-1]
+    param_code += '_%s' % splits_dir.split("_")[0]
 
     ### Batch Size
     if args.batch_size != 1:

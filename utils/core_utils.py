@@ -9,11 +9,11 @@ from sksurv.metrics import concordance_index_censored
 
 import torch
 
-from datasets.dataset_generic import save_splits
+from dataset_generic import save_splits
 from models.model_genomic import SNN
 from models.model_set_mil import MIL_Sum_FC_surv, MIL_Attention_FC_surv, MIL_Cluster_FC_surv
 from models.model_coattn import MCAT_Surv
-from models.model_porpoise import PorpoiseMMF, PorpoiseAMIL, PorpoiseMMF_Fast
+from models.model_porpoise import PorpoiseMMF, PorpoiseAMIL
 from utils.utils import *
 from utils.loss_func import NLLSurvLoss
 
@@ -245,7 +245,7 @@ def train_loop_survival(epoch, model, loader, optimizer, n_classes, writer=None,
             loss = loss_fn(h=h, y=y_disc, t=event_time, c=censor)
             loss_value = loss.item()
         else:
-            h_path, h_omic, h_mm = h
+            h_path, h_omic, h_mm, _, _ = h
             loss = 0.5*loss_fn(h=h_mm, y=y_disc, t=event_time, c=censor)
             loss += 0.25*loss_fn(h=h_path, y=y_disc, t=event_time, c=censor)
             loss += 0.25*loss_fn(h=h_omic, y=y_disc, t=event_time, c=censor)

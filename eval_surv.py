@@ -113,7 +113,7 @@ device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 ### Creates Custom Experiment Code
 exp_code = '_'.join(args.split_dir.split('_')[:2])
-dataset_path = 'dataset_csv'
+dataset_path = 'home/ubuntu/Tuval/Multi_Modal_Fusion/Pan_Cancer/Deep4_9TB_HD/TCGA_Datasets/TCGA_BRCA/Raw_Data/Example/Omics_Data'
 param_code = ''
 
 if args.model_type == 'attention_mil':
@@ -150,7 +150,8 @@ if args.lr != 2e-4:
 if args.reg_type != 'None':
   param_code += '_reg%s' % format(args.lambda_reg, '.0e')
 
-param_code += '_%s' % args.which_splits.split("_")[0]
+splits_dir = args.which_splits.split("/")[-1]
+param_code += '_%s' % splits_dir.split("_")[0]
 
 if args.gc != 1:
   param_code += '_gc%s' % str(args.gc)

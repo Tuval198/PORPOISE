@@ -12,8 +12,12 @@ from timeit import default_timer as timer
 import numpy as np
 import pandas as pd
 
+sys.path.append('/home/ubuntu/Tuval/Multi_Modal_Fusion/Pan_Cancer/Deep4_9TB_HD/PORPOISE/datasets')
+sys.path.append('/home/ubuntu/Tuval/Multi_Modal_Fusion/Pan_Cancer/Deep4_9TB_HD/PORPOISE/models')
+
+
 ### Internal Imports
-from datasets.dataset_survival import Generic_WSI_Survival_Dataset, Generic_MIL_Survival_Dataset
+from dataset_survival import Generic_WSI_Survival_Dataset, Generic_MIL_Survival_Dataset
 from utils.file_utils import save_pkl, load_pkl
 from utils.core_utils import train
 from utils.utils import get_custom_exp_code
@@ -102,7 +106,7 @@ parser.add_argument('--k_start',		 type=int, default=-1, help='Start fold (Defau
 parser.add_argument('--k_end',			 type=int, default=-1, help='End fold (Default: -1, first fold)')
 parser.add_argument('--results_dir',     type=str, default='./results_new', help='Results directory (Default: ./results)')
 parser.add_argument('--which_splits',    type=str, default='5foldcv', help='Which splits folder to use in ./splits/ (Default: ./splits/5foldcv')
-parser.add_argument('--split_dir',       type=str, default='tcga_blca', help='Which cancer type within ./splits/<which_splits> to use for training. Used synonymously for "task" (Default: tcga_blca_100)')
+parser.add_argument('--split_dir',       type=str, default='tcga_blca', help='Which cancer type within <which_splits> to use for training. Used synonymously for "task" (Default: tcga_blca_100)')
 parser.add_argument('--log_data',        action='store_true', default=True, help='Log data using tensorboard')
 parser.add_argument('--overwrite',     	 action='store_true', default=False, help='Whether or not to overwrite experiments (if already ran)')
 
@@ -205,9 +209,10 @@ if 'survival' in args.task:
 	else:
 		combined_study = study
 	
-	study_dir = '%s_20x_features' % combined_study
+	# study_dir = '%s_20x_features' % combined_study
+	study_dir = ''
 
-	dataset = Generic_MIL_Survival_Dataset(csv_path = './%s/%s_all_clean.csv.zip' % (args.dataset_path, study),
+	dataset = Generic_MIL_Survival_Dataset(csv_path = '/%s/%s_data_clean.csv.zip' % (args.dataset_path, study),
 										   mode = args.mode,
 										   apply_sig = args.apply_sig,
 										   data_dir= os.path.join(args.data_root_dir, study_dir),
@@ -240,7 +245,7 @@ if ('summary_latest.csv' in os.listdir(args.results_dir)) and (not args.overwrit
 	sys.exit()
 
 ### Sets the absolute path of split_dir
-args.split_dir = os.path.join('./splits', args.which_splits, args.split_dir)
+args.split_dir = os.path.join(args.which_splits, args.split_dir)
 print("split_dir", args.split_dir)
 assert os.path.isdir(args.split_dir)
 settings.update({'split_dir': args.split_dir})
