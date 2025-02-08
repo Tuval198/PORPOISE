@@ -329,7 +329,7 @@ def validate_survival(cur, epoch, model, loader, n_classes, early_stopping=None,
             loss = loss_fn(h=h, y=y_disc, t=event_time, c=censor)
             loss_value = loss.item()
         else:
-            h_path, h_omic, h_mm = h
+            h_path, h_omic, h_mm, _, _ = h
             loss = 0.5*loss_fn(h=h_mm, y=y_disc, t=event_time, c=censor)
             loss += 0.25*loss_fn(h=h_path, y=y_disc, t=event_time, c=censor)
             loss += 0.25*loss_fn(h=h_omic, y=y_disc, t=event_time, c=censor)
